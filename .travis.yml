@@ -1,0 +1,33 @@
+language: node_js
+node_js:
+  - 16.20.1
+
+services:
+  - docker
+
+install:
+  - echo "Nothing needs to be installed"
+
+before_script:
+  - docker --version
+
+script:
+  - docker build -t udagram-api-feed ./udagram-api-feed
+  - docker tag udagram-api-feed sowntt/udagram-api-feed:v1
+
+  - docker build -t udagram-api-user ./udagram-api-user
+  - docker tag udagram-api-user sowntt/udagram-api-user:v1
+
+  - docker build -t udagram-frontend ./udagram-frontend
+  - docker tag udagram-frontend sowntt/udagram-frontend:v1
+
+  - docker build -t reverseproxy ./udagram-reverseproxy
+  - docker tag reverseproxy sowntt/reverseproxy:v1
+
+after_success:
+  - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
+
+  - docker push sowntt/udagram-api-feed:v1
+  - docker push sowntt/udagram-api-user:v1
+  - docker push sowntt/udagram-frontend:v1
+  - docker push sowntt/reverseproxy:v1
